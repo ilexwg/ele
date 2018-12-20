@@ -17,12 +17,14 @@ export default {
     }
   },
   created() {
-    // axios.get('/api/seller').then((data) => {
-    //   console.log(data)
-    // })
-    getSeller().then((seller) => {
-      this.seller = seller
-    })
+    this._getSeller()
+  },
+  methods: {
+    _getSeller() {
+      getSeller().then((seller) => {
+        this.seller = seller
+      })
+    }
   },
   components: {
     VHeader
