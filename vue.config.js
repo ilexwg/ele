@@ -1,5 +1,11 @@
+const path = require('path')
 const appData = require('./data.json')
 const { seller, goods, ratings } = appData
+
+// 解析目录的方法
+function resolve (dir) {
+  return path.join(__dirname, dir)
+}
 
 module.exports = {
   css: {
@@ -18,6 +24,7 @@ module.exports = {
       theme: true
     }
   },
+  // 配置express服务器
   devServer: {
     before (app) {
       app.get('/api/seller', function (req, res) {
@@ -39,5 +46,11 @@ module.exports = {
         })
       })
     }
+  },
+  // 设置解析目录的别名
+  chainWebpack (config) {
+    config.resolve.alias
+      .set('components', resolve('src/components'))
+      .set('common', resolve('src/common'))
   }
 }
