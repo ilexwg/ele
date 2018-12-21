@@ -23,7 +23,7 @@
           v-for="(tab, index) in tabs"
           :key="index"
         >
-          <component :is="tab.component" :data="tab.data"></component>
+          <component ref="component" :is="tab.component" :data="tab.data"></component>
         </cube-slide-item>
       </cube-slide>
     </div>
@@ -67,9 +67,14 @@ export default {
       }
     }
   },
+  mounted() {
+    this.onChange(this.index)
+  },
   methods: {
     onChange(current) {
       this.index = current
+      const component = this.$refs.component[current]
+      component.fetch && component.fetch()
     },
     onScroll(pos) {
       const tabBarWidth = this.$refs.tabBar.$el.clientWidth
