@@ -30,15 +30,15 @@ export default {
   methods: {
     add(event) {
       if (!this.food.count) {
-        this.$set(this.food, 'count', 1);
+        this.$set(this.food, 'count', 1)
       } else {
-        this.food.count++;
+        this.food.count++
       }
       this.$emit(EVENT_ADD, event.target)
     },
     remove() {
       if (this.food.count) {
-        this.food.count--;
+        this.food.count--
       }
     }
   }

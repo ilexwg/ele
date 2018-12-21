@@ -1,6 +1,6 @@
 <template>
   <div class="shopcart">
-    <div class="content">
+    <div class="content" @click="toggleList">
       <div class="content-left">
         <div class="logo-wrapper">
           <div class="logo"
@@ -16,12 +16,12 @@
         </div>
         <div
           class="price"
-          :class="{'hightlight': totalPrice>0}"
+          :class="{'highlight': totalPrice>0}"
         >¥{{totalPrice}}</div>
         <div class="desc">另需配送费¥{{deliveryPrice}}元</div>
       </div>
       <div class="content-right">
-        <div class="pay" :class="payClass">
+        <div @click.stop="pay" class="pay" :class="payClass">
           {{payDesc}}
         </div>
       </div>
@@ -65,7 +65,8 @@ export default {
   name: 'shop-cart',
   data() {
     return {
-      balls: createBalls()
+      balls: createBalls(),
+      listFold: this.fold
     }
   },
   props: {
@@ -82,6 +83,14 @@ export default {
     minPrice: {
       type: Number,
       default: 0
+    },
+    fold: {
+      type: Boolean,
+      default: true
+    },
+    sticky: {
+      type: Boolean,
+      default: false
     }
   },
   created() {
@@ -104,7 +113,6 @@ export default {
       const rect = ball.el.getBoundingClientRect()
       const x = rect.left - 32
       const y = -(window.innerHeight - rect.top - 22)
-      console.log(y);
       el.style.display = ''
       el.style.transform = el.style.webkitTransform = `translate3d(0, ${y}px, 0)`
       const inner = el.getElementsByClassName(innerClsHook)[0]
@@ -123,6 +131,77 @@ export default {
       if (ball) {
         ball.show = false
         el.style.display = 'none'
+      }
+    },
+    _showShopCartList() {
+      this.shopCartListComp = this.shopCartListComp || this.$createShopCartList({
+        $props: {
+          selectFoods: 'selectFoods'
+        },
+        $events: {
+          hide: () => {
+            this.listFold = true
+          },
+          leave: () => {
+            this._hideShopCartSticky()
+          },
+          add: (el) => {
+            this.shopCartStickyComp.drop(el)
+          }
+        }
+      })
+      this.shopCartListComp.show()
+    },
+    _hideShopCartList() {
+      const comp = this.sticky ? this.$parent.list : this.shopCartListComp
+      comp.hide && comp.hide()
+    },
+    _hideShopCartSticky() {
+      this.shopCartStickyComp.hide()
+    },
+    _showShopCartSticky() {
+      this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
+        $props: {
+          selectFoods: 'selectFoods',
+          deliveryPrice: 'deliveryPrice',
+          minPrice: 'minPrice',
+          fold: 'listFold',
+          list: this.shopCartListComp
+        }
+      })
+      this.shopCartStickyComp.show()
+    },
+    toggleList() {
+      if (this.listFold) {
+        if (!this.totalCount) {
+          return
+        }
+        this.listFold = false
+        this._showShopCartList()
+        this._showShopCartSticky()
+      } else {
+        this.listFold = true
+        this._hideShopCartList()
+      }
+    },
+    pay() {
+      if (this.totalPrice < this.minPrice) {
+        return
+      }
+      this.dialogComp = this.$createDialog({
+        title: '快去支付吧',
+        content: `您需要支付${this.totalPrice}元`
+      })
+      this.dialogComp.show()
+    }
+  },
+  watch: {
+    fold(newVal) {
+      this.listFold = newVal
+    },
+    totalCount(newVal) {
+      if (!this.listFold && !newVal) {
+        this._hideShopCartList()
       }
     }
   },
@@ -170,7 +249,7 @@ export default {
 @import '~common/stylus/variable'
 
 .shopcart
-  position: fixed
+  position: absolute
   left: 0
   right: 0
   bottom: 0
@@ -179,7 +258,7 @@ export default {
   height: 48px
   .content
     display: flex
-    background: #141d27;
+    background: #141d27
     font-size: 0
     color: rgba(255, 255, 255, 0.4)
     .content-left
@@ -242,7 +321,7 @@ export default {
         font-size: 12px
         font-weight: 700
         &.not-enough
-          background: #2b333b;
+          background: #2b333b
         &.enough
           background: #00b43c
           color: #fff

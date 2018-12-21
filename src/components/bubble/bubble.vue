@@ -26,6 +26,7 @@ export default {
   text-align: center
   border-radius: 16px
   background: $color-red
+  box-shadow: 0 0 4px 0 $color-red
   font-family: Helvetica, sans-serif
   font-size: $fontsize-small-s
   font-weight: 700

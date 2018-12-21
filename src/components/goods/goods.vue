@@ -7,6 +7,24 @@
         :options="scrollOptions"
         v-if="goods.length"
       >
+        <template slot="bar" slot-scope="props">
+          <cube-scroll-nav-bar
+            direction="vertical"
+            :labels="props.labels"
+            :txts="barTxts"
+            :current="props.current"
+          >
+            <template slot-scope="props">
+              <div class="text">
+                <support-ico v-if="props.txt.type>=1" :size="3" :type="props.txt.type"></support-ico>
+                <span>{{props.txt.name}}</span>
+                <span class="num">
+                  <bubble v-if="props.txt.count" :num="props.txt.count"></bubble>
+                </span>
+              </div>
+            </template>
+          </cube-scroll-nav-bar>
+        </template>
         <cube-scroll-nav-panel
           v-for="good in goods"
           :key="good.name"
@@ -47,6 +65,7 @@
         ref="shopCart"
         :deliveryPrice="seller.deliveryPrice"
         :minPrice="seller.minPrice"
+        :select-foods="selectFoods"
         class="shop-cart"
       >
       </shop-cart>
@@ -58,6 +77,8 @@
 import { getGoods } from 'api'
 import ShopCart from 'components/shop-cart/shop-cart'
 import CartControl from 'components/cart-control/cart-control'
+import SupportIco from 'components/support-ico/support-ico'
+import Bubble from 'components/bubble/bubble'
 
 export default {
   name: 'goods',
@@ -75,14 +96,18 @@ export default {
       scrollOptions: {
         click: false,
         directionLockThreshold: 0
-      }
+      },
+      fetched: false
     }
   },
   methods: {
     fetch() {
-      getGoods().then((goods) => {
-        this.goods = goods
-      })
+      if (!this.fetched) {
+        this.fetched = true
+        getGoods().then((goods) => {
+          this.goods = goods
+        })
+      }
     },
     onAdd(el) {
       this.$refs.shopCart.drop(el)
@@ -102,11 +127,29 @@ export default {
         })
       })
       return ret
+    },
+    barTxts() {
+      let ret = []
+      this.goods.forEach((good) => {
+        const { type, name, foods } = good
+        let count = 0
+        foods.forEach((food) => {
+          count += food.count || 0
+        })
+        ret.push({
+          type,
+          name,
+          count
+        })
+      })
+      return ret
     }
   },
   components: {
     ShopCart,
-    CartControl
+    CartControl,
+    SupportIco,
+    Bubble
   }
 }
 </script>
