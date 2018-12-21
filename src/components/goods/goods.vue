@@ -35,6 +35,7 @@
             <li
               v-for="food in good.foods"
               :key="food.name"
+              @click.stop="selectFood(food)"
               class="food-item"
             >
               <div class="icon">
@@ -70,6 +71,7 @@
       >
       </shop-cart>
     </div>
+    <!-- <food :food="selectedFood" ref="food"></food> -->
   </div>
 </template>
 
@@ -93,6 +95,7 @@ export default {
   data() {
     return {
       goods: [],
+      selectedFood: {},
       scrollOptions: {
         click: false,
         directionLockThreshold: 0
@@ -111,6 +114,41 @@ export default {
     },
     onAdd(el) {
       this.$refs.shopCart.drop(el)
+    },
+    _hideShopCartSticky() {
+      this.shopCartStickyComp.hide()
+    },
+    _showFood() {
+      this.foodComp = this.foodComp || this.$createFood({
+        $props: {
+          food: 'selectedFood'
+        },
+        $events: {
+          leave: () => {
+            this._hideShopCartSticky()
+          },
+          add: (el) => {
+            this.shopCartStickyComp.drop(el)
+          }
+        }
+      })
+      this.foodComp.show()
+    },
+    _showShopCartSticky() {
+      this.shopCartStickyComp = this.shopCartStickyComp || this.$createShopCartSticky({
+        $props: {
+          selectFoods: 'selectFoods',
+          deliveryPrice: this.seller.deliveryPrice,
+          minPrice: this.seller.minPrice,
+          food: true
+        }
+      })
+      this.shopCartStickyComp.show()
+    },
+    selectFood(food) {
+      this.selectedFood = food
+      this._showFood()
+      this._showShopCartSticky()
     }
   },
   computed: {
