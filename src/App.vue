@@ -14,7 +14,6 @@ import Goods from 'components/goods/goods'
 import Seller from 'components/seller/seller'
 import Ratings from 'components/ratings/ratings'
 import { getSeller } from 'api'
-import axios from 'axios'
 
 export default {
   name: 'app',
@@ -65,10 +64,7 @@ export default {
   },
   components: {
     VHeader,
-    Tab,
-    Goods,
-    Ratings,
-    Seller
+    Tab
   }
 }
 </script>

@@ -80,7 +80,7 @@ export default {
       const tabBarWidth = this.$refs.tabBar.$el.clientWidth
       const slideWidth = this.$refs.slide.slide.scrollerWidth
       const transform = -pos.x / slideWidth * tabBarWidth
-      this.$refs.tabBar.setSliderTransform(transform);
+      this.$refs.tabBar.setSliderTransform(transform)
     }
   }
 }
