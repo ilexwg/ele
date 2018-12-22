@@ -214,6 +214,7 @@ export default {
             color: rgb(147, 153, 159)
         .text
           margin-bottom: 8px
+          white-space: normal
           line-height: 18px
           font-size: 12px
           color: rgb(7, 17, 27)
