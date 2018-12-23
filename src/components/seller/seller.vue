@@ -52,7 +52,7 @@
       <split></split>
       <div class="pics">
         <h1 class="title">商家实景</h1>
-        <cube-scroll :data="seller" class="pic-wrapper" :options="picScrollOptions">
+        <cube-scroll class="pic-wrapper" direction="horizontal" :options="picScrollOptions">
           <ul class="pic-list">
             <li
               class="pic-item"
@@ -76,20 +76,6 @@
         </ul>
       </div>
       <split></split>
-      <div class="pictures">
-        <h1 class="title">商家实景</h1>
-        <cube-scroll :data="seller" class="picture-wrapper" :options="picScrollOptions">
-          <ul class="picture-list">
-            <li
-              class="picture-item"
-              v-for="(pic, index) in seller.pics"
-              :key="index"
-            >
-              <img :src="pic" width="120" height="90">
-            </li>
-          </ul>
-        </cube-scroll>
-      </div>
     </div>
   </cube-scroll>
 </template>
@@ -98,6 +84,9 @@
 import SupportIco from 'components/support-ico/support-ico'
 import Split from 'components/split/split'
 import Star from 'components/star/star'
+import { saveToLocal, loadFromLocal } from 'common/js/storage'
+
+const KEY = 'favorite'
 
 export default {
   name: 'seller',
@@ -136,12 +125,13 @@ export default {
       return this.favorite ? '已收藏' : '收藏'
     }
   },
+  created() {
+    this.favorite = loadFromLocal(this.seller.id, KEY, false)
+  },
   methods: {
     toggleFavorite(event) {
-      if (!event._constructed) {
-        return
-      }
       this.favorite = !this.favorite
+      saveToLocal(this.seller.id, KEY, this.favorite)
     }
   }
 }
@@ -255,18 +245,21 @@ export default {
     .pic-wrapper
       // width: 100%
       // overflow: hidden
-      // white-space: nowrap
-      .pic-list
-        font-size: 0
-        .pic-item
-          display: inline-block
-          margin-right: 6px
-          width: 120px
-          height: 90px
-          &:last-child
-            margin: 0
-          img
-            display: block
+      white-space: nowrap
+      >>> .cube-scroll-content
+        display: inline-block
+        .pic-list
+          white-space: nowrap
+          font-size: 0
+          .pic-item
+            display: inline-block
+            margin-right: 6px
+            width: 120px
+            height: 90px
+            &:last-child
+              margin: 0
+            img
+              display: block
   .info
     padding: 18px 18px 0 18px
     color: rgb(7, 17, 27)
@@ -282,26 +275,4 @@ export default {
       font-size: 12px
       &:last-child
         border-none()
-  .pictures
-    padding: 18px
-    .title
-      margin-bottom: 12px
-      line-height: 14px
-      font-size: 14px
-      color: rgb(7, 17, 27)
-    .picture-wrapper
-      // width: 100%
-      // overflow: hidden
-      // white-space: nowrap
-      .picture-list
-        font-size: 0
-        .picture-item
-          display: inline-block
-          margin-right: 6px
-          width: 120px
-          height: 90px
-          &:last-child
-            margin: 0
-          img
-            display: block
 </style>
